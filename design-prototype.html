@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dalu Docs Cleaner | AI-Ready Documentation Scraper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --obsidian: #050505;
+            --neon-cyan: #00FFFF;
+            --matrix-green: #00FF41;
+            --pulse-red: #FF3131;
+            --glow-opacity: 0.15;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--neon-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+
+        .glow-border {
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 255, var(--glow-opacity));
+        }
+
+        .glow-text {
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            z-index: 100;
+            background: rgba(0, 255, 255, 0.03);
+            opacity: 0.7;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: 0%; }
+        }
+
+        .terminal-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+        }
+
+        .btn-cyan {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cyan:hover {
+            background: var(--neon-cyan);
+            color: var(--obsidian);
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        .input-terminal {
+            background: #000;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            color: var(--neon-cyan);
+        }
+
+        .input-terminal:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .sidebar-link {
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(0, 255, 255, 0.05);
+            border-left-color: var(--neon-cyan);
+            padding-left: 1.25rem;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <div class="scanline"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="h-14 border-b border-cyan-900/50 flex items-center justify-between px-6 bg-black/80 backdrop-blur-md z-10">
+        <div class="flex items-center space-x-4">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+            <span class="text-xl font-bold tracking-tighter glow-text">DALU_DOCS_CLEANER.sys</span>
+        </div>
+        
+        <div class="flex items-center space-x-8 text-xs font-light uppercase tracking-widest">
+            <div class="flex items-center">
+                <span class="status-dot bg-matrix-green"></span>
+                API_STATUS: ONLINE
+            </div>
+            <div class="flex items-center">
+                <span class="text-white/40 mr-2">CREDITS:</span>
+                <span class="text-matrix-green">4,821 / 5,000</span>
+            </div>
+            <div class="flex items-center space-x-4 border-l border-cyan-900/50 pl-8">
+                <i data-lucide="bell" class="w-4 h-4 cursor-pointer hover:text-white"></i>
+                <i data-lucide="settings" class="w-4 h-4 cursor-pointer hover:text-white"></i>
+                <div class="w-8 h-8 rounded-full glow-border flex items-center justify-center bg-cyan-950/30">
+                    <span class="text-[10px]">JD</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 border-r border-cyan-900/30 bg-black/40 flex flex-col py-6">
+            <div class="px-6 mb-8">
+                <button class="w-full btn-cyan py-2 rounded text-xs font-bold uppercase tracking-widest flex items-center justify-center space-x-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>New Extraction</span>
+                </button>
+            </div>
+
+            <nav class="flex-1 space-y-1 text-sm">
+                <a href="#" class="sidebar-link active flex items-center px-6 py-3">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 mr-3"></i> Dashboard
+                </a>
+                <a href="#" class="sidebar-link flex items-center px-6 py-3 text-cyan-400/60">
+                    <i data-lucide="git-branch" class="w-4 h-4 mr-3"></i> Knowledge Graph
+                </a>
+                <a href="#" class="sidebar-link flex items-center px-6 py-3 text-cyan-400/60">
+                    <i data-lucide="file-text" class="w-4 h-4 mr-3"></i> Saved Profiles
+                </a>
+                <a href="#" class="sidebar-link flex items-center px-6 py-3 text-cyan-400/60">
+                    <i data-lucide="database" class="w-4 h-4 mr-3"></i> Vector Sync
+                </a>
+                <div class="pt-8 px-6 text-[10px] uppercase text-cyan-900 font-bold tracking-[3px] mb-2">History</div>
+                <a href="#" class="sidebar-link flex items-center px-6 py-2 text-xs text-cyan-400/40">
+                    <i data-lucide="clock" class="w-3 h-3 mr-3"></i> firecrawl-api-v1
+                </a>
+                <a href="#" class="sidebar-link flex items-center px-6 py-2 text-xs text-cyan-400/40">
+                    <i data-lucide="clock" class="w-3 h-3 mr-3"></i> nextjs-docs-full
+                </a>
+                <a href="#" class="sidebar-link flex items-center px-6 py-2 text-xs text-cyan-400/40">
+                    <i data-lucide="clock" class="w-3 h-3 mr-3"></i> tailwind-ref-3
+                </a>
+            </nav>
+
+            <div class="px-6 mt-auto">
+                <div class="p-3 rounded border border-cyan-900/30 bg-cyan-950/10">
+                    <div class="text-[10px] text-cyan-700 uppercase mb-1">Current Node</div>
+                    <div class="text-[11px] truncate">192.168.1.104/local-node</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col bg-[#050505]">
+            <!-- Hero Scraper Input -->
+            <div class="p-8 border-b border-cyan-900/20 bg-gradient-to-b from-black to-transparent">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-3xl font-bold mb-2 glow-text tracking-tighter">AI-Ready Documentation Scraper</h1>
+                    <p class="text-cyan-400/50 text-sm mb-8">Convert any URL into clean, structured Markdown for your LLM context window.</p>
+                    
+                    <div class="flex space-x-4">
+                        <div class="relative flex-1">
+                            <i data-lucide="terminal" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400/40"></i>
+                            <input type="text" placeholder="https://docs.example.com/api/v1" class="w-full input-terminal py-4 pl-12 pr-4 rounded text-sm placeholder:text-cyan-900">
+                        </div>
+                        <button onclick="startSimulation()" class="btn-cyan px-8 py-4 rounded text-sm font-bold uppercase tracking-widest flex items-center space-x-2">
+                            <span>Execute</span>
+                            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace Grid -->
+            <div class="flex-1 grid grid-cols-2 gap-4 p-4 overflow-hidden">
+                <!-- Left Panel: Visualization -->
+                <div class="glow-border rounded-lg bg-black/60 flex flex-col overflow-hidden">
+                    <div class="h-10 border-b border-cyan-900/30 flex items-center justify-between px-4 text-[10px] uppercase font-bold tracking-widest bg-cyan-950/20">
+                        <div class="flex items-center">
+                            <i data-lucide="network" class="w-3 h-3 mr-2"></i> Mapping Documentation
+                        </div>
+                        <div class="text-cyan-400/40">v1.4.2</div>
+                    </div>
+                    <div id="visualizer" class="flex-1 relative flex items-center justify-center p-8 text-center">
+                        <div id="idle-msg" class="space-y-4">
+                            <i data-lucide="search" class="w-12 h-12 mx-auto text-cyan-900/50"></i>
+                            <div class="text-cyan-900 uppercase tracking-[4px] text-xs">Awaiting Target URL</div>
+                        </div>
+                        
+                        <!-- Simulation elements (hidden initially) -->
+                        <div id="sim-viz" class="hidden w-full h-full flex flex-col">
+                            <div class="flex-1 flex items-center justify-center">
+                                <div class="relative w-48 h-48">
+                                    <div class="absolute inset-0 border-2 border-cyan-500 rounded-full animate-ping opacity-20"></div>
+                                    <div class="absolute inset-4 border border-cyan-400 rounded-full animate-pulse"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                        <div id="progress-val" class="text-3xl font-bold">0%</div>
+                                        <div class="text-[8px] uppercase tracking-widest mt-1">Crawling</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="h-24 grid grid-cols-4 gap-2">
+                                <div class="border border-cyan-900/30 bg-cyan-950/10 p-2 text-left">
+                                    <div class="text-[8px] text-cyan-700">Nodes</div>
+                                    <div class="text-xs" id="node-count">0</div>
+                                </div>
+                                <div class="border border-cyan-900/30 bg-cyan-950/10 p-2 text-left">
+                                    <div class="text-[8px] text-cyan-700">Depth</div>
+                                    <div class="text-xs">3</div>
+                                </div>
+                                <div class="border border-cyan-900/30 bg-cyan-950/10 p-2 text-left">
+                                    <div class="text-[8px] text-cyan-700">Failures</div>
+                                    <div class="text-xs text-pulse-red">0</div>
+                                </div>
+                                <div class="border border-cyan-900/30 bg-cyan-950/10 p-2 text-left">
+                                    <div class="text-[8px] text-cyan-700">ETA</div>
+                                    <div class="text-xs">02:14</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Markdown Preview -->
+                <div class="glow-border rounded-lg bg-black/60 flex flex-col overflow-hidden">
+                    <div class="h-10 border-b border-cyan-900/30 flex items-center justify-between px-4 text-[10px] uppercase font-bold tracking-widest bg-cyan-950/20">
+                        <div class="flex items-center">
+                            <i data-lucide="code" class="w-3 h-3 mr-2"></i> Cleaned Markdown Output
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="hover:text-white"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                            <button class="hover:text-white"><i data-lucide="download" class="w-3 h-3"></i></button>
+                        </div>
+                    </div>
+                    <div id="preview" class="flex-1 p-6 terminal-scroll overflow-y-auto text-xs leading-relaxed text-cyan-400/70 font-light">
+                        <div id="preview-placeholder" class="h-full flex flex-col items-center justify-center opacity-30 italic">
+                            Output will appear here after cleaning...
+                        </div>
+                        <div id="preview-content" class="hidden">
+                            <span class="text-matrix-green">---</span><br>
+                            <span class="text-matrix-green">title: API Authentication</span><br>
+                            <span class="text-matrix-green">source: docs.example.com/api/auth</span><br>
+                            <span class="text-matrix-green">---</span><br><br>
+                            
+                            <span class="text-white font-bold text-lg"># Authentication</span><br><br>
+                            
+                            To interact with our API, you must include a Bearer token in the `Authorization` header of all requests.<br><br>
+                            
+                            <span class="text-white font-bold">## Generating an API Key</span><br><br>
+                            
+                            1. Navigate to the **Developer Settings** in your dashboard.<br>
+                            2. Click on <span class="text-cyan-400 underline italic">Create New API Key</span>.<br>
+                            3. Select the required scopes (Read/Write).<br>
+                            4. Copy the generated secret.<br><br>
+                            
+                            <div class="bg-black border border-cyan-900 p-3 my-4">
+                                <span class="text-cyan-900">// Example Request</span><br>
+                                curl -X GET "https://api.example.com/user" \<br>
+                                &nbsp;&nbsp;-H "Authorization: Bearer YOUR_API_KEY"
+                            </div>
+
+                            <span class="text-white font-bold">## Scopes</span><br><br>
+                            
+                            - `user.read`: Read profile information.<br>
+                            - `user.write`: Update profile information.<br>
+                            - `billing.read`: Access invoice history.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Log Footer -->
+            <footer class="h-32 border-t border-cyan-900/50 bg-black p-4 font-mono text-[10px] overflow-hidden flex flex-col">
+                <div class="flex items-center justify-between mb-2 text-cyan-700 font-bold uppercase tracking-widest border-b border-cyan-950 pb-1">
+                    <div class="flex items-center">
+                        <i data-lucide="command" class="w-3 h-3 mr-2"></i> System Logs
+                    </div>
+                    <div>Press <span class="text-cyan-400">CTRL+K</span> for command center</div>
+                </div>
+                <div id="logs" class="flex-1 terminal-scroll overflow-y-auto space-y-1">
+                    <div class="text-matrix-green opacity-50">[09:21:04] INITIALIZING SYSTEM...</div>
+                    <div class="text-matrix-green opacity-50">[09:21:05] LOADED ENGINE V4.8.2-PRO</div>
+                    <div class="text-matrix-green opacity-50">[09:21:05] CONNECTED TO GLOBAL CRAWLER NETWORK</div>
+                    <div class="text-cyan-400/30">[SYSTEM] SYSTEM READY. STANDING BY.</div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        const logs = document.getElementById('logs');
+        const simViz = document.getElementById('sim-viz');
+        const idleMsg = document.getElementById('idle-msg');
+        const progressVal = document.getElementById('progress-val');
+        const nodeCount = document.getElementById('node-count');
+        const previewContent = document.getElementById('preview-content');
+        const previewPlaceholder = document.getElementById('preview-placeholder');
+
+        function addLog(msg, color = 'text-cyan-400/30') {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            div.className = color;
+            div.innerHTML = `<span class="opacity-50">[${time}]</span> ${msg}`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function startSimulation() {
+            addLog('INITIATING EXTRACTION SEQUENCE...', 'text-white font-bold');
+            idleMsg.classList.add('hidden');
+            simViz.classList.remove('hidden');
+            previewPlaceholder.classList.add('hidden');
+            previewContent.classList.add('hidden');
+
+            let progress = 0;
+            let nodes = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 7) + 1;
+                nodes += Math.floor(Math.random() * 12) + 2;
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    addLog('EXTRACTION COMPLETE. CLEANING DATA...', 'text-matrix-green font-bold');
+                    setTimeout(() => {
+                        previewContent.classList.remove('hidden');
+                        addLog('DATA TRANSFORMED TO SEMANTIC MARKDOWN.', 'text-matrix-green');
+                    }, 1000);
+                }
+
+                progressVal.innerText = `${progress}%`;
+                nodeCount.innerText = nodes;
+
+                if (progress % 10 < 5) {
+                    addLog(`CRAWLING NODE_${nodes}_HASH_${Math.random().toString(36).substring(7).toUpperCase()}...`);
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
