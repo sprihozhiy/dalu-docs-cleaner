@@ -240,9 +240,9 @@ body {
 }
 
 /* ── Syntax Highlighting ── */
-.code-keyword  { color: #00e5e5; }
-.code-string   { color: #a0ffc0; }
-.code-comment  { color: #777777; font-style: italic; }
-.code-number   { color: #ffd700; }
-.code-function { color: #ff80bf; }
-.code-variable { color: #bbbbbb; }
+.log-keyword  { color: #00e5e5; }
+.log-string   { color: #a0ffc0; }
+.log-comment  { color: #777777; font-style: italic; }
+.log-number   { color: #ffd700; }
+.log-function { color: #ff80bf; }
+.log-variable { color: #bbbbbb; }
