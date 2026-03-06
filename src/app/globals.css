@@ -1,26 +1,30 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-obsidian: #1a1a1a;
+  --color-neon-cyan: #00e5e5;
+  --color-dark-grey: #444444;
+  --color-light-grey: #bbbbbb;
+  --color-medium-grey: #777777;
+  --color-card-bg: #111111;
+  --color-code-bg: #0a0a0a;
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-fira-code);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #1a1a1a;
+  color: #bbbbbb;
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
+
+/* Code syntax highlighting */
+.code-keyword { color: #00e5e5; }
+.code-string { color: #a0ffc0; }
+.code-comment { color: #777777; font-style: italic; }
+.code-number { color: #ffd700; }
+.code-function { color: #ff80bf; }
+.code-variable { color: #bbbbbb; }
