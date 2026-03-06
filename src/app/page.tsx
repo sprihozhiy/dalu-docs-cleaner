@@ -1,65 +1,163 @@
-import Image from "next/image";
+const navItems = [
+  { label: "Dashboard", active: true },
+  { label: "Documents", active: false },
+  { label: "Context Sources", active: false },
+  { label: "AI Models", active: false },
+  { label: "Settings", active: false },
+  { label: "Help", active: false },
+];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#1a1a1a" }}>
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <h2 className="sidebar-title">DALU CLI</h2>
+        <nav>
+          <ul className="sidebar-nav">
+            {navItems.map((item) => (
+              <li key={item.label}>
+                <a
+                  href="#"
+                  className={`sidebar-nav-link${item.active ? " active" : ""}`}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <div style={{ flexGrow: 1, padding: "30px" }}>
+        {/* Header */}
+        <header className="page-header">
+          <h1>Dashboard Overview</h1>
+          <div className="search-bar-wrapper">
+            <span className="search-bar-icon">🔎</span>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search documentation or commands..."
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+        </header>
+
+        {/* Card grid */}
+        <div className="card-grid">
+          <section className="dashboard-card">
+            <h3 className="card-title">AI Context Generation Status</h3>
+            <p>
+              Monitoring the real-time processing and generation of context for AI models
+              across all integrated documentation sources.
+            </p>
+            <div className="card-status">
+              <strong>Status:</strong>{" "}
+              <span style={{ color: "#66FF66" }}>Online &amp; Active</span>
+              <br />
+              <strong>Last Update:</strong> 2026-03-05 10:30:00
+            </div>
+          </section>
+
+          <section className="dashboard-card">
+            <h3 className="card-title">Document Ingestion Queue</h3>
+            <p>
+              Overview of pending and processed documents awaiting contextualization for
+              AI consumption.
+            </p>
+            <div className="card-status">
+              <strong>Pending:</strong> 12 documents
+              <br />
+              <strong>Processed (last 24h):</strong> 485 documents
+            </div>
+          </section>
+
+          <section className="dashboard-card">
+            <h3 className="card-title">Model Performance Insights</h3>
+            <p>
+              Key metrics on how AI models are leveraging generated documentation context
+              for enhanced responses.
+            </p>
+            <div className="card-status">
+              <strong>Context Hit Rate:</strong> 92.5%
+              <br />
+              <strong>Avg. Response Time:</strong> 150ms
+            </div>
+          </section>
         </div>
-      </main>
+
+        {/* Code viewer */}
+        <section className="code-viewer">
+          <h3 className="code-viewer-title">
+            Latest System Logs{" "}
+            <span className="code-viewer-subtitle">[tail -f /var/log/daludocs.log]</span>
+          </h3>
+          <pre className="code-pre">
+            <code className="code-content">
+              <span className="log-comment"># Dalu Docs Cleaner System Log - 2026-03-05</span>
+              {"\n"}
+              <span className="log-keyword">INFO</span>
+              {"    "}[10:30:01]{" "}
+              <span className="log-function">ContextEngine</span>: Initializing{" "}
+              <span className="log-variable">AI_Context_Processor</span>...
+              {"\n"}
+              <span className="log-keyword">DEBUG</span>
+              {"   "}[10:30:02]{" "}
+              <span className="log-function">DocIngestor</span>: Processing document{" "}
+              <span className="log-string">&quot;API_Reference_v2.md&quot;</span> (
+              <span className="log-number">1/12</span>)
+              {"\n"}
+              <span className="log-keyword">INFO</span>
+              {"    "}[10:30:05]{" "}
+              <span className="log-function">ContextEngine</span>: Context generated for{" "}
+              <span className="log-string">&quot;API_Reference_v2.md&quot;</span>.
+              {"\n"}
+              <span className="log-keyword">SUCCESS</span>
+              {" "}[10:30:07]{" "}
+              <span className="log-function">ModelAdapter</span>: Context provided to{" "}
+              <span className="log-variable">GPT-4_Agent</span>. Score:{" "}
+              <span className="log-number">0.98</span>
+              {"\n"}
+              <span className="log-keyword">INFO</span>
+              {"    "}[10:30:10]{" "}
+              <span className="log-function">DocIngestor</span>: Processing document{" "}
+              <span className="log-string">&quot;User_Guide_CLI.pdf&quot;</span> (
+              <span className="log-number">2/12</span>)
+              {"\n"}
+              <span className="log-keyword">WARN</span>
+              {"    "}[10:30:12]{" "}
+              <span className="log-function">ContextEngine</span>: Detected{" "}
+              <span className="log-number">3</span> minor inconsistencies in{" "}
+              <span className="log-string">&quot;User_Guide_CLI.pdf&quot;</span>. Automatic
+              reconciliation initiated.
+              {"\n"}
+              <span className="log-keyword">DEBUG</span>
+              {"   "}[10:30:15]{" "}
+              <span className="log-function">CacheManager</span>: Cache hit for{" "}
+              <span className="log-string">&quot;/docs/common/auth&quot;</span>.
+              {"\n"}
+              <span className="log-keyword">INFO</span>
+              {"    "}[10:30:18]{" "}
+              <span className="log-function">SystemMonitor</span>: CPU utilization:{" "}
+              <span className="log-number">25%</span>, Memory:{" "}
+              <span className="log-number">3.2GB</span>/
+              <span className="log-number">8GB</span>.
+              {"\n"}
+              <span className="log-keyword">INFO</span>
+              {"    "}[10:30:20]{" "}
+              <span className="log-function">ContextEngine</span>: Context generated for{" "}
+              <span className="log-string">&quot;User_Guide_CLI.pdf&quot;</span>.
+              {"\n"}
+              <span className="log-keyword">INFO</span>
+              {"    "}[10:30:22]{" "}
+              <span className="log-function">DocIngestor</span>: Document{" "}
+              <span className="log-string">&quot;Release_Notes_v1.1.docx&quot;</span> added to
+              queue.
+            </code>
+          </pre>
+        </section>
+      </div>
     </div>
   );
 }
