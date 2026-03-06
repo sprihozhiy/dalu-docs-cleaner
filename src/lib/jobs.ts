@@ -49,7 +49,8 @@ function toPublicJob(job: ScrapeJob): PublicJob {
 
 async function runJob(jobId: string): Promise<void> {
   const job = jobs.get(jobId);
-  if (!job) {
+  // A pending job may have been canceled before the microtask ran.
+  if (!job || job.status === "failed") {
     return;
   }
 
@@ -130,6 +131,10 @@ export function getJob(jobId: string): PublicJob | null {
   return job ? toPublicJob(job) : null;
 }
 
+// REVIEW: Jobs are never evicted from the in-memory map. On a long-running
+// server this leaks memory proportional to the number of jobs created (each
+// job result can hold many scraped pages). Consider a TTL-based cleanup or a
+// max-jobs LRU cap.
 export function getJobs(): PublicJob[] {
   return Array.from(jobs.values())
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))

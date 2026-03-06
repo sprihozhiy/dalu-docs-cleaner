@@ -75,6 +75,10 @@ function extractInternalLinks(html: string, pageUrl: string, rootOrigin: string)
   return Array.from(links);
 }
 
+// REVIEW: No SSRF protection. The caller can supply any URL including private
+// network addresses (e.g. http://169.254.169.254, http://10.0.0.1,
+// http://localhost). Resolve the hostname to an IP and reject RFC-1918 /
+// loopback / link-local ranges before fetching.
 export async function crawlDocumentation(
   startUrl: string,
   maxDepth = 2,
@@ -96,9 +100,17 @@ export async function crawlDocumentation(
       break;
     }
 
+    // REVIEW: No per-request timeout. A slow or stalled server will hold the
+    // job open indefinitely. Consider combining the abort signal with a
+    // per-request timeout: AbortSignal.any([signal, AbortSignal.timeout(30_000)]).
     const response = await fetch(item.url, { signal: options.signal });
     if (!response.ok) {
-      throw new Error(`Failed to fetch ${item.url}: ${response.status}`);
+      // Skip non-ok pages rather than aborting the entire crawl — a single
+      // 404 on a discovered link should not fail all already-scraped pages.
+      processedCount += 1;
+      const progress = (processedCount / (processedCount + queue.length)) * 100;
+      options.onProgress?.(progress);
+      continue;
     }
 
     const contentType = response.headers.get("content-type") ?? "";
@@ -109,6 +121,12 @@ export async function crawlDocumentation(
       continue;
     }
 
+    // REVIEW: No response body size limit. A malicious or misconfigured server
+    // can return a gigabyte-sized body and exhaust server memory. Consider
+    // enforcing a max body size (e.g. 5 MB) before calling response.text().
+    // REVIEW: No cap on total pages crawled. A site with thousands of unique
+    // internal links will visit all of them. Consider a MAX_PAGES constant and
+    // breaking out of the loop when pages.length reaches it.
     const html = await response.text();
     const cleanHtml = sanitizeContent(html);
     const markdown = turndown.turndown(cleanHtml).trim();

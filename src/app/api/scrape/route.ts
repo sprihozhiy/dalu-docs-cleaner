@@ -31,8 +31,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "A valid http/https URL is required" }, { status: 400 });
   }
 
-  if (!Number.isInteger(depth) || depth < 0) {
-    return NextResponse.json({ error: "Depth must be a non-negative integer" }, { status: 400 });
+  if (!Number.isInteger(depth) || depth < 0 || depth > 5) {
+    return NextResponse.json({ error: "Depth must be a non-negative integer no greater than 5" }, { status: 400 });
   }
 
   const job = createJob(url, depth);
