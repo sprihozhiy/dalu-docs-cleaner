@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dalu Docs Cleaner | AI-Ready Scraper</title>
+    <style>
+        :root {
+            --obsidian: #050505;
+            --cyan: #00f3ff;
+            --cyan-glow: rgba(0, 243, 255, 0.4);
+            --dim-cyan: rgba(0, 243, 255, 0.15);
+            --matrix-green: #00ff41;
+            --panel-bg: rgba(20, 20, 20, 0.7);
+            --border-style: 1px solid var(--dim-cyan);
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--cyan);
+            font-family: var(--font-mono);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            letter-spacing: 0.05em;
+        }
+
+        /* CRT Scanline Effect Overlay */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        header {
+            padding: 1rem 1.5rem;
+            border-bottom: var(--border-style);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.9);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid var(--matrix-green);
+            padding: 0.2rem 0.6rem;
+            color: var(--matrix-green);
+            text-shadow: 0 0 5px var(--matrix-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--matrix-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr 400px;
+            overflow: hidden;
+        }
+
+        .panel {
+            border-right: var(--border-style);
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-bg);
+        }
+
+        .panel-header {
+            padding: 0.75rem;
+            background: var(--dim-cyan);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Sidebar / Config */
+        .config-area {
+            padding: 1.5rem;
+            gap: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], select {
+            background: #111;
+            border: 1px solid var(--dim-cyan);
+            color: var(--cyan);
+            padding: 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px var(--dim-cyan);
+        }
+
+        button.primary {
+            background: var(--cyan);
+            color: var(--obsidian);
+            border: none;
+            padding: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        button.primary:hover {
+            box-shadow: 0 0 20px var(--cyan-glow);
+            filter: brightness(1.2);
+        }
+
+        /* Terminal Area */
+        .terminal-panel {
+            background: #000;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .log-entry { margin-bottom: 0.4rem; }
+        .log-timestamp { color: #555; margin-right: 0.5rem; }
+        .log-info { color: var(--cyan); }
+        .log-success { color: var(--matrix-green); }
+        .log-warn { color: #ffcc00; }
+
+        /* Preview Area */
+        .preview-panel {
+            border-right: none;
+            border-left: var(--border-style);
+        }
+
+        .preview-content {
+            flex: 1;
+            padding: 1.5rem;
+            font-family: 'Inter', sans-serif; /* Cleaner for markdown preview */
+            color: #ccc;
+            overflow-y: auto;
+            background: #0a0a0a;
+        }
+
+        .md-h1 { font-size: 1.5rem; color: var(--cyan); margin-bottom: 1rem; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 0.5rem; }
+        .md-p { margin-bottom: 1rem; font-size: 0.9rem; line-height: 1.6; }
+        .md-code { background: #1a1a1a; padding: 0.2rem 0.4rem; font-family: var(--font-mono); color: #fff; font-size: 0.8rem; }
+
+        footer {
+            height: 30px;
+            background: var(--dim-cyan);
+            border-top: var(--border-style);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-size: 0.65rem;
+            justify-content: space-between;
+        }
+
+        .metrics { display: flex; gap: 1.5rem; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--obsidian); }
+        ::-webkit-scrollbar-thumb { background: var(--dim-cyan); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">DALU // DOCS_CLEANER v5.0</div>
+        <div class="status-pill">
+            <div class="status-dot"></div>
+            SYSTEM_ONLINE // AI_READY
+        </div>
+    </header>
+
+    <main>
+        <!-- CONFIG SIDEBAR -->
+        <aside class="panel">
+            <div class="panel-header">CONFIGURATION [INPUT_CORE]</div>
+            <div class="config-area">
+                <div class="input-group">
+                    <label>Target URL</label>
+                    <input type="text" placeholder="https://docs.example.com/api..." value="https://react.dev/reference">
+                </div>
+                <div class="input-group">
+                    <label>Output Format</label>
+                    <select>
+                        <option>MARKDOWN (.md)</option>
+                        <option>JSON_STRUCTURED</option>
+                        <option>TEXT_RAW</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Scrape Depth</label>
+                    <select>
+                        <option>LEVEL 1 (Single Page)</option>
+                        <option>LEVEL 2 (Sub-sections)</option>
+                        <option>LEVEL 3 (Deep Link)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>AI Filtering Context</label>
+                    <div style="display:flex; gap:0.5rem; font-size: 0.7rem; color: #777;">
+                        <input type="checkbox" checked> Remove Nav/Footer
+                    </div>
+                    <div style="display:flex; gap:0.5rem; font-size: 0.7rem; color: #777;">
+                        <input type="checkbox" checked> Flatten Code Blocks
+                    </div>
+                    <div style="display:flex; gap:0.5rem; font-size: 0.7rem; color: #777;">
+                        <input type="checkbox"> Extract Metadata
+                    </div>
+                </div>
+                <button class="primary">Initialize Scrape_</button>
+            </div>
+        </aside>
+
+        <!-- MAIN TERMINAL -->
+        <section class="panel terminal-panel">
+            <div class="panel-header">
+                LIVE_FEED [DATA_TRANSFORM]
+                <span>0.00ms // PID: 8821</span>
+            </div>
+            <div class="terminal-body">
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:01]</span>
+                    <span class="log-info">Connecting to https://react.dev/reference...</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:01]</span>
+                    <span class="log-success">Connection established. HTTP 200 OK.</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:02]</span>
+                    <span class="log-info">DOM Tree analysis started. Found 142 meaningful nodes.</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:03]</span>
+                    <span class="log-info">Cleaning: Removing 'nav.navigation' (noise_score: 0.98)</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:03]</span>
+                    <span class="log-info">Cleaning: Removing 'footer.main' (noise_score: 0.95)</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:04]</span>
+                    <span class="log-success">Extracting: 'useActionState' documentation...</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:05]</span>
+                    <span class="log-info">Converting HTML Tables to Markdown... DONE.</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:06]</span>
+                    <span class="log-warn">Heuristic Alert: Found large SVG blob. Stripping for AI brevity.</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[14:22:07]</span>
+                    <span class="log-success">Transformation Complete. 12.4KB output generated.</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-info">> _</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- PREVIEW PANEL -->
+        <aside class="panel preview-panel">
+            <div class="panel-header">PREVIEW [CLEANED_MD]</div>
+            <div class="preview-content">
+                <div class="md-h1">useActionState</div>
+                <div class="md-p">
+                    `useActionState` is a Hook that allows you to update state based on the result of a form action.
+                </div>
+                <div class="md-p">
+                    <span class="md-code">const [state, formAction] = useActionState(fn, initialState, permalink?);</span>
+                </div>
+                <div class="md-p">
+                    <strong>Parameters:</strong>
+                    <ul>
+                        <li><span class="md-code">fn</span>: The function to be called when the form is submitted.</li>
+                        <li><span class="md-code">initialState</span>: The value you want the state to be initially.</li>
+                    </ul>
+                </div>
+                <div class="md-p" style="opacity: 0.4;">
+                    [... Rest of cleaned documentation content continues here ...]
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <div class="metrics">
+            <span>MEM: 24.2MB</span>
+            <span>CPU: 4%</span>
+            <span>UPTIME: 14:21:05</span>
+        </div>
+        <div>v5.0.0-PROTOTYPE // DALU_CORE</div>
+    </footer>
+
+</body>
+</html>
