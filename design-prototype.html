@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dalu Docs Cleaner - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --obsidian-bg: #0D0D11;
+            --neon-cyan: #00FFFF;
+            --subtle-gray: #888888;
+            --magenta-pink: #FF00FF;
+            --panel-bg: #1A1A21;
+        }
+
+        body {
+            background-color: var(--obsidian-bg);
+            color: var(--neon-cyan);
+            font-family: 'Fira Code', monospace;
+            margin: 0;
+            padding: 20px;
+            text-shadow: 0 0 5px var(--neon-cyan);
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: auto;
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+            padding: 20px;
+            grid-column: span 12;
+        }
+
+        .header {
+            grid-column: span 12;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 1.2em;
+            color: var(--subtle-gray);
+        }
+        
+        .scraper-input {
+            grid-column: span 8;
+        }
+
+        .scraper-status {
+            grid-column: span 4;
+        }
+
+        .output-panel {
+            grid-column: span 12;
+            height: 300px;
+            overflow-y: scroll;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            flex-grow: 1;
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px;
+            font-family: 'Fira Code', monospace;
+            text-shadow: 0 0 5px var(--neon-cyan);
+        }
+
+        .input-group button {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            text-shadow: 0 0 5px var(--neon-cyan);
+        }
+
+        .input-group button:hover {
+            background-color: var(--neon-cyan);
+            color: var(--obsidian-bg);
+        }
+
+        .status-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .status-list li {
+            margin-bottom: 10px;
+        }
+        
+        .status-list .completed {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px var(--neon-cyan);
+        }
+
+        .status-list .pending {
+            color: var(--subtle-gray);
+            text-shadow: none;
+        }
+        
+        .chart-container {
+             grid-column: span 12;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Dalu Docs Cleaner</h1>
+            <p>AI-Ready Documentation Scraper</p>
+        </div>
+
+        <div class="panel scraper-input">
+            <h2>Scraper Control</h2>
+            <div class="input-group">
+                <input type="text" placeholder="Enter documentation URL...">
+                <button>Start Scraping</button>
+            </div>
+            <p>Enter a URL to begin the documentation cleaning process.</p>
+        </div>
+
+        <div class="panel scraper-status">
+            <h2>Scraping Status</h2>
+            <div class="status-list">
+                <ul>
+                    <li class="completed">[✓] Fetching...</li>
+                    <li class="completed">[✓] Parsing...</li>
+                    <li class="pending">[ ] Cleaning...</li>
+                    <li class="pending">[ ] Complete</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="panel output-panel">
+            <h2>Cleaned Output</h2>
+            <pre>
+{
+    "title": "Example Documentation",
+    "sections": [
+        {
+            "header": "Introduction",
+            "content": "This is a sample of cleaned documentation text."
+        },
+        {
+            "header": "API Reference",
+            "content": "API details would be formatted here."
+        }
+    ]
+}
+            </pre>
+        </div>
+        
+        <div class="panel chart-container">
+            <h2>Scraping Analytics</h2>
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+    
+    <script>
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                borderWidth: 1,
+                borderColor: '#00FFFF',
+                backgroundColor: 'rgba(0, 255, 255, 0.2)',
+            }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#00FFFF'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#00FFFF'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#00FFFF'
+                        }
+                    }
+                }
+            }
+        });
+</script>
+
+</body>
+</html>
